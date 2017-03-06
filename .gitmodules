@@ -1,0 +1,4 @@
+[submodule "reversed_ks"]
+	path = reversed_ks
+	url = https://github.com/thibbo/reversed_ks.git
+	branch = master
