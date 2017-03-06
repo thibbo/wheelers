@@ -20,4 +20,48 @@
         sample:msbp_measurementUnit="km/h"
         sample:msbp_dialogEnabled="true"/>
 
+    <com.pavelsikun.seekbarpreference.SeekBarPreference
+        android:key="@string/alarm1"
+        android:title="Alarm 1"
+        android:enabled="true"
+        android:defaultValue="0"
+        sample:msbp_minValue="0"
+        sample:msbp_maxValue="40"
+        sample:msbp_interval="1"
+        sample:msbp_measurementUnit="km/h"
+        sample:msbp_dialogEnabled="true"/>
+
+    <com.pavelsikun.seekbarpreference.SeekBarPreference
+        android:key="@string/alarm2"
+        android:title="Alarm 2"
+        android:enabled="true"
+        android:defaultValue="0"
+        sample:msbp_minValue="0"
+        sample:msbp_maxValue="40"
+        sample:msbp_interval="1"
+        sample:msbp_measurementUnit="km/h"
+        sample:msbp_dialogEnabled="true"/>
+
+    <com.pavelsikun.seekbarpreference.SeekBarPreference
+        android:key="@string/alarm3"
+        android:title="Alarm 3"
+        android:enabled="true"
+        android:defaultValue="25"
+        sample:msbp_minValue="0"
+        sample:msbp_maxValue="40"
+        sample:msbp_interval="1"
+        sample:msbp_measurementUnit="km/h"
+        sample:msbp_dialogEnabled="true"/>
+
+    <com.pavelsikun.seekbarpreference.SeekBarPreference
+        android:key="@string/tilt_back"
+        android:title="Tilt back"
+        android:summary="The maximum speed shown on the outer dial"
+        android:enabled="true"
+        android:defaultValue="25"
+        sample:msbp_minValue="0"
+        sample:msbp_maxValue="40"
+        sample:msbp_interval="1"
+        sample:msbp_measurementUnit="km/h"
+        sample:msbp_dialogEnabled="true"/>
 </PreferenceScreen>

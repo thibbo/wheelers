@@ -578,4 +578,24 @@ public class WheelData {
         }
         return false;
     }
+
+    public void setAlarms(int alarm1, int alarm2, int alarm3, int tilt_back) {
+        byte[] data = new byte[0x14];
+        data[0x0] = -0x56;
+        data[0x1] = 0x55;
+        data[0x2] = (byte) alarm1;
+        data[0x3] = 0x0;
+        data[0x4] = (byte) alarm2;
+        data[0x5] = 0x0;
+        data[0x6] = (byte) alarm3;
+        data[0x7] = 0x0;
+        data[0x8] = (byte) tilt_back;
+        data[0x9] = 0x0;
+        data[0x10] = -0x7b;
+        data[0x11] = 0x14;
+        data[0x12] = 0x5a;
+        data[0x13] = 0x5a;
+        if(mBluetoothLeService != null)
+            mBluetoothLeService.writeBluetoothGattCharacteristic(data);
+    }
 }

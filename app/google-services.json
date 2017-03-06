@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "727129398337",
+    "firebase_url": "https://wheelapplication-31053.firebaseio.com",
+    "project_id": "wheelapplication-31053",
+    "storage_bucket": "wheelapplication-31053.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:727129398337:android:548291bb3083251d",
+        "android_client_info": {
+          "package_name": "com.cooper.wheellog"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "727129398337-p3ram7jkesr1ftqp0t8hlp4pkckb9ll0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cooper.wheellog",
+            "certificate_hash": "09754F27ECFA40AFF62670FE4F8F636B7BF8A2C5"
+          }
+        },
+        {
+          "client_id": "727129398337-v6h84t3q90h88p5t9lcb271ss4qsb1m2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCL8_u_scmztz-n34oVE7-jPqUBpXCdkvw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "727129398337-v6h84t3q90h88p5t9lcb271ss4qsb1m2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

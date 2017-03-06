@@ -22,4 +22,8 @@
         android:title="Watch Preferences"
         android:icon="@drawable/ic_watch_white_24dp" />
 
+    <Preference
+        android:key="@string/debrider_preferences"
+        android:title="Debrider" />
+
 </PreferenceScreen>

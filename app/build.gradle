@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         applicationId "com.cooper.wheellog"
@@ -23,14 +23,21 @@ apply plugin: 'android-apt'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:design:25.0.0'
-    compile 'com.android.support:gridlayout-v7:25.0.0'
-    compile 'com.google.android.gms:play-services-drive:9.6.1'
+    compile 'com.android.support:design:25.1.1'
+    compile 'com.firebaseui:firebase-ui:1.1.1'
+    compile 'com.android.support:gridlayout-v7:25.1.1'
+    compile 'com.google.android.gms:play-services-drive:10.0.1'
     compile 'com.getpebble:pebblekit:3.1.0'
     compile 'com.github.JakeWharton:ViewPagerIndicator:2.4.1'
     compile 'com.jakewharton.timber:timber:4.3.1'
     compile 'com.pavelsikun:material-seekbar-preference:2.3.0'
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.0'
-    compile "com.github.hotchemi:permissionsdispatcher:2.2.0"
-    apt "com.github.hotchemi:permissionsdispatcher-processor:2.2.0"
+    compile 'com.github.hotchemi:permissionsdispatcher:2.2.0'
+    compile 'com.google.firebase:firebase-core:10.0.1'
+    compile 'com.google.firebase:firebase-auth:10.0.1'
+    apt 'com.github.hotchemi:permissionsdispatcher-processor:2.2.0'
 }
+
+
+
+apply plugin: 'com.google.gms.google-services'

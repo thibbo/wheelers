@@ -67,7 +67,15 @@ public class SettingsUtil {
     public static void setAutoUploadEnabled(Context context, boolean enabled) {
         getSharedPreferences(context).edit().putBoolean(context.getString(R.string.auto_upload), enabled).apply();
     }
-    
+
+    public static boolean isUnlockerEnabled(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.unlocker_enabled), false);
+    }
+
+    public static void setUnlockerEnabled(Context context, boolean enabled) {
+        getSharedPreferences(context).edit().putBoolean(context.getString(R.string.unlocker_enabled), enabled).apply();
+    }
+
     private static SharedPreferences getSharedPreferences(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context);
     }

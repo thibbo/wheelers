@@ -16,9 +16,11 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
-import android.os.IBinder;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -26,11 +28,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.os.Handler;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,9 +44,10 @@ import com.cooper.wheellog.utils.Constants.WHEEL_TYPE;
 import com.cooper.wheellog.utils.SettingsUtil;
 import com.cooper.wheellog.utils.Typefaces;
 import com.cooper.wheellog.views.WheelView;
+import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.database.FirebaseListAdapter;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -53,10 +58,19 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.slel.ChatMessage;
+import com.slel.KeyGenerator;
+import com.slel.MessagingActivity;
 import com.viewpagerindicator.LinePageIndicator;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 
 import permissions.dispatcher.NeedsPermission;
@@ -69,12 +83,16 @@ import static com.cooper.wheellog.utils.MathsUtil.kmToMiles;
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
+    protected static final int SIGN_IN_REQUEST_CODE = 10;
+    protected static final int RESULT_DEVICE_SCAN_REQUEST = 20;
+    protected static final int RESULT_REQUEST_ENABLE_BT = 30;
+    protected static final int REQUEST_CODE_RESOLUTION = 40;
     Menu mMenu;
+    ViewPager pager;
     MenuItem miSearch;
     MenuItem miWheel;
     MenuItem miWatch;
     MenuItem miLogging;
-
     TextView tvSpeed;
     TextView tvTemperature;
     TextView tvCurrent;
@@ -91,34 +109,20 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     TextView tvTotalDistance;
     TextView tvRideTime;
     TextView tvMode;
-
     LineChart chart1;
-
     WheelView wheelView;
-    
+    ListView messageListView;
+    int viewPagerPage = 1;
     private BluetoothLeService mBluetoothLeService;
     private BluetoothAdapter mBluetoothAdapter;
     private String mDeviceAddress;
-    private int mConnectionState = BluetoothLeService.STATE_DISCONNECTED;
-    private boolean doubleBackToExitPressedOnce = false;
-    private Snackbar snackbar;
-    int viewPagerPage = 0;
-    private ArrayList<String> xAxis_labels = new ArrayList<>();
-    private boolean use_mph = false;
-    private GoogleApiClient mGoogleApiClient;
-    private DrawerLayout mDrawer;
-
-    protected static final int RESULT_DEVICE_SCAN_REQUEST = 20;
-    protected static final int RESULT_REQUEST_ENABLE_BT = 30;
-    protected static final int REQUEST_CODE_RESOLUTION = 40;
-
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
             if (!mBluetoothLeService.initialize()) {
-                Timber.e( getResources().getString(R.string.error_bluetooth_not_initialised));
+                Timber.e(getResources().getString(R.string.error_bluetooth_not_initialised));
                 Toast.makeText(MainActivity.this, R.string.error_bluetooth_not_initialised, Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -136,7 +140,35 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             finish();
         }
     };
+    private int mConnectionState = BluetoothLeService.STATE_DISCONNECTED;
+    private boolean doubleBackToExitPressedOnce = false;
+    private Snackbar snackbar;
+    private ArrayList<String> xAxis_labels = new ArrayList<>();
+    IAxisValueFormatter chartAxisValueFormatter = new IAxisValueFormatter() {
+        @Override
+        public String getFormattedValue(float value, AxisBase axis) {
+            if (value < xAxis_labels.size())
+                return xAxis_labels.get((int) value);
+            else
+                return "";
+        }
 
+        // we don't draw numbers, so no decimal digits needed
+        @Override
+        public int getDecimalDigits() {
+            return 0;
+        }
+    };
+    private boolean use_mph = false;
+    ViewPager.SimpleOnPageChangeListener pageChangeListener = new ViewPager.SimpleOnPageChangeListener() {
+        @Override
+        public void onPageSelected(int position) {
+            super.onPageSelected(position);
+            viewPagerPage = position;
+            updateScreen(true);
+        }
+    };
+    private GoogleApiClient mGoogleApiClient;
     private final BroadcastReceiver mBluetoothUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -175,6 +207,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         }
     };
+    private DrawerLayout mDrawer;
+    private FirebaseListAdapter<ChatMessage> adapter;
+    private DatabaseReference mDatabase;
 
     private void setConnectionState(int connectionState) {
 
@@ -252,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             miLogging.setIcon(R.drawable.ic_action_logging_white);
         }
     }
-    
+
     private void configureDisplay(WHEEL_TYPE wheelType) {
         TextView tvWaitText = (TextView) findViewById(R.id.tvWaitText);
         TextView tvTitleSpeed = (TextView) findViewById(R.id.tvTitleSpeed);
@@ -371,7 +406,49 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private void updateScreen(boolean updateGraph) {
         switch (viewPagerPage) {
-            case 0: // GUI View
+            case 0:
+                if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+                    // Start sign in/sign up activity
+                    startActivityForResult(AuthUI.getInstance()
+                                    .createSignInIntentBuilder()
+                                    .setProviders(Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
+                                            new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()
+                                    ))
+                                    .setLogo(R.mipmap.logo)
+                                    .setTheme(R.style.AppTheme)
+                                    .build(),
+                            SIGN_IN_REQUEST_CODE);
+                }
+                else {
+                    // Load chat room contents
+                    displayChatMessages();
+                }
+                FloatingActionButton fab =
+                        (FloatingActionButton)findViewById(R.id.fab);
+
+                fab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        EditText input = (EditText)findViewById(R.id.input);
+                        if(input.getText().toString().equals(""))
+                            return;
+
+                        // Read the input field and push a new instance
+                        // of ChatMessage to the Firebase database
+                        mDatabase = FirebaseDatabase.getInstance().getReference();
+                        mDatabase.child("Global").push()
+                                .setValue(new ChatMessage(input.getText().toString(),
+                                        FirebaseAuth.getInstance()
+                                                .getCurrentUser()
+                                                .getDisplayName())
+                                );
+
+                        // Clear the input
+                        input.setText("");
+                    }
+                });
+                break;
+            case 1: // GUI View
                 wheelView.setSpeed(WheelData.getInstance().getSpeed());
                 wheelView.setBattery(WheelData.getInstance().getBatteryLevel());
                 wheelView.setTemperature(WheelData.getInstance().getTemperature());
@@ -382,7 +459,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 wheelView.setVoltage(WheelData.getInstance().getVoltageDouble());
                 wheelView.setCurrent(WheelData.getInstance().getPowerDouble());
                 break;
-            case 1: // Text View
+            case 2: // Text View
                 if (use_mph) {
                     tvSpeed.setText(String.format(Locale.US, "%.1f mph", kmToMiles(WheelData.getInstance().getSpeedDouble())));
                     tvTopSpeed.setText(String.format(Locale.US, "%.1f mph", kmToMiles(WheelData.getInstance().getTopSpeedDouble())));
@@ -401,14 +478,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 tvPower.setText(String.format(Locale.US, "%.2fW", WheelData.getInstance().getPowerDouble()));
                 tvBattery.setText(String.format(Locale.US, "%d%%", WheelData.getInstance().getBatteryLevel()));
                 tvFanStatus.setText(WheelData.getInstance().getFanStatus() == 0 ? "Off" : "On");
-                tvVersion.setText(String.format(Locale.US, "%.2f", WheelData.getInstance().getVersion()/100.0));
+                tvVersion.setText(String.format(Locale.US, "%.2f", WheelData.getInstance().getVersion() / 100.0));
                 tvName.setText(WheelData.getInstance().getName());
                 tvModel.setText(WheelData.getInstance().getModel());
                 tvSerial.setText(WheelData.getInstance().getSerial());
                 tvRideTime.setText(WheelData.getInstance().getRideTimeString());
                 tvMode.setText(getResources().getStringArray(R.array.modes)[WheelData.getInstance().getMode()]);
                 break;
-            case 2: // Graph  View
+            case 3: // Graph  View
                 if (updateGraph) {
                     xAxis_labels = WheelData.getInstance().getXAxis();
 
@@ -457,8 +534,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             dataSetCurrent.addEntry(new Entry(dataSetCurrent.getEntryCount(), value));
                         }
 
-                        for (Float d : speedAxis)
-                        {
+                        for (Float d : speedAxis) {
                             float value = 0;
 
                             if (d != null)
@@ -481,6 +557,29 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         }
     }
 
+    private void displayChatMessages() {
+        adapter = new FirebaseListAdapter<ChatMessage>(this, ChatMessage.class,
+                R.layout.message, FirebaseDatabase.getInstance().getReference().child("Global")) {
+            @Override
+            protected void populateView(View v, ChatMessage model, int position) {
+                // Get references to the views of message.xml
+                TextView messageText = (TextView)v.findViewById(R.id.message_text);
+                TextView messageUser = (TextView)v.findViewById(R.id.message_user);
+                TextView messageTime = (TextView)v.findViewById(R.id.message_time);
+
+                // Set their text
+                messageText.setText(model.getMessageText());
+                messageUser.setText(model.getMessageUser());
+
+                // Format the date before showing it
+                messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
+                        model.getMessageTime()));
+            }
+        };
+
+        messageListView.setAdapter(adapter);
+    }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -498,12 +597,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .commit();
 
         ViewPageAdapter adapter = new ViewPageAdapter(this);
-        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);
-        pager.setOffscreenPageLimit(3);
+        pager.setOffscreenPageLimit(4);
 
-        LinePageIndicator titleIndicator = (LinePageIndicator)findViewById(R.id.indicator);
+        LinePageIndicator titleIndicator = (LinePageIndicator) findViewById(R.id.indicator);
         titleIndicator.setViewPager(pager);
+        pager.setCurrentItem(1);
         pager.addOnPageChangeListener(pageChangeListener);
 
         mDeviceAddress = SettingsUtil.getLastAddress(getApplicationContext());
@@ -528,6 +628,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         tvMode = (TextView) findViewById(R.id.tvMode);
         wheelView = (WheelView) findViewById(R.id.wheelView);
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        messageListView = (ListView) findViewById(R.id.list_of_messages);
 
         mDrawer.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
@@ -583,7 +684,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mDrawer.openDrawer(GravityCompat.START, true);                }
+                    mDrawer.openDrawer(GravityCompat.START, true);
+                }
             }, 1000);
         }
 
@@ -686,9 +788,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             case R.id.miWatch:
                 togglePebbleService();
                 return true;
+            case R.id.menu_sign_out:
+                signOut();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void signOut() {
+        AuthUI.getInstance().signOut(this)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(MainActivity.this,
+                                "You have been signed out.",
+                                Toast.LENGTH_LONG)
+                                .show();
+                    }
+                });
     }
 
     public boolean onKeyUp(int keyCode, KeyEvent event) {
@@ -727,22 +845,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         }
     }
 
-    ViewPager.SimpleOnPageChangeListener pageChangeListener = new ViewPager.SimpleOnPageChangeListener(){
-        @Override
-        public void onPageSelected(int position) {
-            super.onPageSelected(position);
-            viewPagerPage = position;
-            updateScreen(true);
-        }
-    };
-
     private void loadPreferences() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         use_mph = sharedPreferences.getBoolean(getString(R.string.use_mph), false);
-        int max_speed = sharedPreferences.getInt(getString(R.string.max_speed), 30) * 10;
+        int max_speed = sharedPreferences.getInt(getString(R.string.max_speed), 30);
         wheelView.setMaxSpeed(max_speed);
         wheelView.setUseMPH(use_mph);
         wheelView.invalidate();
+
+        // attempt to write alarms
+        int alarm1 = sharedPreferences.getInt(getString(R.string.alarm1), 10);
+        int alarm2 = sharedPreferences.getInt(getString(R.string.alarm2), 15);
+        int alarm3 = sharedPreferences.getInt(getString(R.string.alarm3), 20);
+        int tilt_back = sharedPreferences.getInt(getString(R.string.tilt_back), 25);
+        WheelData.getInstance().setAlarms(alarm1, alarm2, alarm3, tilt_back);
+
 
         boolean alarms_enabled = sharedPreferences.getBoolean(getString(R.string.alarms_enabled), false);
 
@@ -780,14 +897,35 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if (auto_upload)
             getGoogleApiClient().connect();
 
+        boolean unlockSpeedLimit = sharedPreferences.getBoolean(getString(R.string.unlocker_enabled), false);
+
+        if(unlockSpeedLimit)
+            unlockSpeedLimit();
+
         updateScreen(true);
     }
 
+    private void unlockSpeedLimit() {
+        if(mDeviceAddress == null) {
+            Toast.makeText(this, R.string.device_connection_required, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if(!SettingsUtil.isUnlockerEnabled(getApplicationContext())) {
+            //unlock
+            KeyGenerator keyGen = new KeyGenerator(mDeviceAddress);
+            String result = keyGen.FindKey();
+        }
+
+    }
+
     @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
-    void acquireStoragePermission() {}
+    void acquireStoragePermission() {
+    }
 
     @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-    void acquireLocationPermission() {}
+    void acquireLocationPermission() {
+    }
 
     @OnPermissionDenied({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
     void storagePermissionDenied() {
@@ -801,8 +939,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         ((PreferencesFragment) getPreferencesFragment()).refreshVolatileSettings();
     }
 
-    private void showSnackBar(int msg) { showSnackBar(getString(msg)); }
-    private void showSnackBar(String msg) { showSnackBar(msg, 2000); }
+    private void showSnackBar(int msg) {
+        showSnackBar(getString(msg));
+    }
+
+    private void showSnackBar(String msg) {
+        showSnackBar(msg, 2000);
+    }
+
     private void showSnackBar(String msg, int timeout) {
         if (snackbar == null) {
             View mainView = findViewById(R.id.main_view);
@@ -811,7 +955,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             snackbar.getView().setBackgroundResource(R.color.primary_dark);
             snackbar.setAction(android.R.string.ok, new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {}
+                public void onClick(View view) {
+                }
             });
         }
         snackbar.setDuration(timeout);
@@ -831,7 +976,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             toggleLoggingService();
     }
 
-    @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE})
+    @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
     void toggleLoggingService() {
         Intent dataLoggerServiceIntent = new Intent(getApplicationContext(), LoggingService.class);
 
@@ -845,6 +990,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if (PebbleService.isInstanceCreated())
             togglePebbleService();
     }
+
     private void togglePebbleService() {
         Intent pebbleServiceIntent = new Intent(getApplicationContext(), PebbleService.class);
         if (PebbleService.isInstanceCreated())
@@ -894,10 +1040,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             case RESULT_REQUEST_ENABLE_BT:
                 if (mBluetoothAdapter.isEnabled())
                     startBluetoothService();
-                else {
-                    Toast.makeText(this, R.string.bluetooth_required, Toast.LENGTH_LONG).show();
-                    finish();
-                }
+//                else {
+//                    Toast.makeText(this, R.string.bluetooth_required, Toast.LENGTH_LONG).show();
+//                    finish();
+//                }
                 break;
             case REQUEST_CODE_RESOLUTION:
                 if (resultCode == RESULT_OK)
@@ -905,6 +1051,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 else {
                     SettingsUtil.setAutoUploadEnabled(this, false);
                     ((PreferencesFragment) getPreferencesFragment()).refreshVolatileSettings();
+                }
+                break;
+            case SIGN_IN_REQUEST_CODE:
+                if(resultCode == RESULT_OK) {
+                    Toast.makeText(this, "Successfully signed in. Welcome!", Toast.LENGTH_LONG).show();
+                    displayChatMessages();
+                }
+                else {
+                    pager.setCurrentItem(1);
                 }
                 break;
         }
@@ -919,20 +1074,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         intentFilter.addAction(Constants.ACTION_PREFERENCE_CHANGED);
         return intentFilter;
     }
-
-    IAxisValueFormatter chartAxisValueFormatter = new IAxisValueFormatter() {
-        @Override
-        public String getFormattedValue(float value, AxisBase axis) {
-            if (value < xAxis_labels.size())
-                return xAxis_labels.get((int) value);
-            else
-                return "";
-        }
-
-        // we don't draw numbers, so no decimal digits needed
-        @Override
-        public int getDecimalDigits() {  return 0; }
-    };
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {

@@ -6,6 +6,7 @@
     <string name="error_bluetooth_not_supported">Bluetooth is not supported on your device.</string>
     <string name="error_bluetooth_not_initialised">Unable to initialize Bluetooth, exiting</string>
     <string name="bluetooth_required">Bluetooth is required and was not successfully enabled.</string>
+    <string name="device_connection_required">Device connection required.</string>
     <string name="bluetooth_direct_connect_failed">Direct connection failed. Searching for Wheel…</string>
     <string name="back_to_exit">Press BACK again to exit</string>
     <string name="scan">Scan</string>
@@ -72,6 +73,7 @@
     <string name="log_preferences" translatable="false">log_preferences</string>
     <string name="alarm_preferences" translatable="false">alarm_preferences</string>
     <string name="watch_preferences" translatable="false">watch_preferences</string>
+    <string name="debrider_preferences" translatable="false">debrider_preferences</string>
 
     // ALARM PREFERENCES
     <string name="alarms_enabled" translatable="false">alarms_enabled</string>
@@ -93,8 +95,15 @@
     // SPEED PREFERENCES
     <string name="use_mph" translatable="false">use_mph</string>
     <string name="max_speed" translatable="false">max_speed</string>
+    <string name="alarm1" translatable="false">alarm1</string>
+    <string name="alarm2" translatable="false">alarm2</string>
+    <string name="alarm3" translatable="false">alarm3</string>
+    <string name="tilt_back" translatable="false">tilt_back</string>
 
     // WATCH PREFERENCES
     <string name="horn_mode" translatable="false">horn_mode</string>
 
+    // UNLOCKER PREFERENCES
+    <string name="unlocker_enabled" translatable="false">unlocker_enabled</string>
+    <string name="reconnect_button">RECONNECT</string>
 </resources>

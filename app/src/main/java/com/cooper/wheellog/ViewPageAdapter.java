@@ -18,12 +18,15 @@ class ViewPageAdapter extends PagerAdapter {
         int resId = 0;
         switch (position) {
             case 0:
-                resId = R.id.page_one;
+                resId = R.id.messaging;
                 break;
             case 1:
-                resId = R.id.page_two;
+                resId = R.id.page_one;
                 break;
             case 2:
+                resId = R.id.page_two;
+                break;
+            case 3:
                 resId = R.id.page_three;
                 break;
         }
@@ -32,7 +35,7 @@ class ViewPageAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return 4;
     }
 
     @Override

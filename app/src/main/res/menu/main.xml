@@ -24,4 +24,7 @@
         android:icon="@drawable/ic_action_watch_white"
         android:title="@string/start_pebble_service">
     </item>
+
+    <item android:title="Sign out" app:showAsAction="never"
+        android:id="@+id/menu_sign_out"/>
 </menu>
