@@ -73,6 +73,9 @@
     <string name="log_preferences" translatable="false">log_preferences</string>
     <string name="alarm_preferences" translatable="false">alarm_preferences</string>
     <string name="watch_preferences" translatable="false">watch_preferences</string>
+    <string name="color_light_preferences" translatable="false">color_light_preferences</string>
+    <string name="light_preferences" translatable="false">light_preferences</string>
+    <string name="cycling_mode_preferences" translatable="false">cycling_mode_preferences</string>
     <string name="debrider_preferences" translatable="false">debrider_preferences</string>
 
     // ALARM PREFERENCES
@@ -99,6 +102,17 @@
     <string name="alarm2" translatable="false">alarm2</string>
     <string name="alarm3" translatable="false">alarm3</string>
     <string name="tilt_back" translatable="false">tilt_back</string>
+
+    // COLOR LIGHT PREFERENCES
+    <string name="activate_color_light" translatable="false">activate_color_light</string>
+    <string name="color_light_modes" translatable="false">color_light_modes</string>
+
+    // LIGHT PREFERENCES
+    <string name="activate_light" translatable="false">activate_light</string>
+    <string name="light_modes" translatable="false">light_modes</string>
+
+    // CYCLING MODE PREFERENCES
+    <string name="cycling_modes" translatable="false">cycling_modes</string>
 
     // WATCH PREFERENCES
     <string name="horn_mode" translatable="false">horn_mode</string>

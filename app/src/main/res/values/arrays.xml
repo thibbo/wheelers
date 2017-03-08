@@ -16,4 +16,40 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+
+    <string-array name="color_light_modes">
+        <item>mode 1</item>
+        <item>mode 2</item>
+        <item>mode 3</item>
+    </string-array>
+
+    <string-array name="color_light_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="light_modes">
+        <item>ON</item>
+        <item>AUTO</item>
+        <item>OFF</item>
+    </string-array>
+
+    <string-array name="light_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="cycling_modes">
+        <item>Player mode</item>
+        <item>Riding mode</item>
+        <item>Learning mode</item>
+    </string-array>
+
+    <string-array name="cycling_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>

@@ -580,18 +580,115 @@ public class WheelData {
     }
 
     public void setAlarms(int alarm1, int alarm2, int alarm3, int tilt_back) {
+        byte[] data = new byte[20];
+        data[0x0] = -86;
+        data[0x1] = 85;
+        data[0x2] = (byte) alarm1;
+//        data[3] = 0;
+        data[0x4] = (byte) alarm2;
+//        data[5] = 0;
+        data[0x6] = (byte) alarm3;
+//        data[7] = 0;
+        data[0x8] = (byte) tilt_back;
+//        data[9] = 0;
+        data[0x10] = -123;
+        data[0x11] = 20;
+        data[0x12] = 90;
+        data[0x13] = 90;
+        if(mBluetoothLeService != null)
+            mBluetoothLeService.writeBluetoothGattCharacteristic(data);
+    }
+
+    public void readAlarmParas() {
+        byte[] data = new byte[20];
+        data[0] = -86;
+        data[1] = 85;
+        data[16] = -104;
+        data[17] = 20;
+        data[18] = 90;
+        data[19] = 90;
+        if(mBluetoothLeService != null)
+            mBluetoothLeService.writeBluetoothGattCharacteristic(data);
+    }
+
+    public enum CYCLING_MODE {
+        PLAY,
+        RIDE,
+        LEARNING
+    }
+
+    public void setCyclingMode(CYCLING_MODE mode) {
+        byte[] arrayOfByte = new byte[20];
+        arrayOfByte[0] = -86;
+        arrayOfByte[1] = 85;
+        arrayOfByte[2] = (byte) mode.ordinal();
+        arrayOfByte[3] = -32;
+        arrayOfByte[16] = -121;
+        arrayOfByte[17] = 20;
+        arrayOfByte[18] = 90;
+        arrayOfByte[19] = 90;
+        if(mBluetoothLeService != null)
+            mBluetoothLeService.writeBluetoothGattCharacteristic(arrayOfByte);
+    }
+
+    public void setLight(int value) {
         byte[] data = new byte[0x14];
         data[0x0] = -0x56;
         data[0x1] = 0x55;
-        data[0x2] = (byte) alarm1;
-        data[0x3] = 0x0;
-        data[0x4] = (byte) alarm2;
-        data[0x5] = 0x0;
-        data[0x6] = (byte) alarm3;
-        data[0x7] = 0x0;
-        data[0x8] = (byte) tilt_back;
-        data[0x9] = 0x0;
-        data[0x10] = -0x7b;
+        data[0x2] = (byte)value;
+        data[0x10] = 0x53;
+        data[0x11] = 0x14;
+        data[0x12] = 0x5a;
+        data[0x13] = 0x5a;
+        if(mBluetoothLeService != null)
+            mBluetoothLeService.writeBluetoothGattCharacteristic(data);
+    }
+
+    public enum LIGHT_MODE {
+        ON,
+        AUTO,
+        OFF
+    }
+
+    public void setLightMode(LIGHT_MODE mode) {
+        byte[] data = new byte[0x14];
+        data[0x0] = -0x56;
+        data[0x1] = 0x55;
+        data[0x2] = (byte) mode.ordinal();
+        data[0x3] = (byte) 0x0;
+        data[0x10] = 0x73;
+        data[0x11] = 0x14;
+        data[0x12] = 0x5a;
+        data[0x13] = 0x5a;
+        if(mBluetoothLeService != null)
+            mBluetoothLeService.writeBluetoothGattCharacteristic(data);
+    }
+
+    public void setColorLight(int value) {
+        byte[] data = new byte[0x14];
+        data[0x0] = -0x56;
+        data[0x1] = 0x55;
+        data[0x2] = (byte) value;
+        data[0x10] = 0x6c;
+        data[0x11] = 0x14;
+        data[0x12] = 0x5a;
+        data[0x13] = 0x5a;
+        if(mBluetoothLeService != null)
+            mBluetoothLeService.writeBluetoothGattCharacteristic(data);
+    }
+
+    public enum COLOR_LIGHT_MODE {
+        MODE_1,
+        MODE_2,
+        MODE_3
+    }
+
+    public void setColorLightMode(COLOR_LIGHT_MODE mode) {
+        byte[] data = new byte[0x14];
+        data[0x0] = -0x56;
+        data[0x1] = 0x55;
+        data[0x2] = (byte) mode.ordinal();
+        data[0x10] = 0x50;
         data[0x11] = 0x14;
         data[0x12] = 0x5a;
         data[0x13] = 0x5a;

@@ -860,6 +860,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         int tilt_back = sharedPreferences.getInt(getString(R.string.tilt_back), 25);
         WheelData.getInstance().setAlarms(alarm1, alarm2, alarm3, tilt_back);
 
+        boolean color_light_enabled = sharedPreferences.getBoolean(getString(R.string.activate_color_light), true);
+        int color_light_mode = Integer.valueOf(sharedPreferences.getString(getString(R.string.color_light_modes), "0"));
+        WheelData.getInstance().setColorLight(color_light_enabled ? 1 : 0);
+        WheelData.getInstance().setColorLightMode(WheelData.COLOR_LIGHT_MODE.values()[color_light_mode]);
+
+        boolean light_enabled = sharedPreferences.getBoolean(getString(R.string.activate_light), true);
+        int light_mode = Integer.valueOf(sharedPreferences.getString(getString(R.string.light_modes), "0"));
+        WheelData.getInstance().setLight(light_enabled ? 1 : 0);
+        WheelData.getInstance().setLightMode(WheelData.LIGHT_MODE.values()[light_mode]);
+
+        int cycling_mode = sharedPreferences.getInt(getString(R.string.cycling_modes), 1);
+        WheelData.getInstance().setCyclingMode(WheelData.CYCLING_MODE.values()[cycling_mode]);
+
 
         boolean alarms_enabled = sharedPreferences.getBoolean(getString(R.string.alarms_enabled), false);
 

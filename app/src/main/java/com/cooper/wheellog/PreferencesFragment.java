@@ -22,7 +22,10 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
         Speed,
         Logs,
         Alarms,
-        Watch
+        Watch,
+        Color_Lights,
+        Lights,
+        Cycling_mode
     }
 
     private boolean mDataWarningDisplayed = false;
@@ -112,6 +115,9 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                 Preference logs_button = findPreference(getString(R.string.log_preferences));
                 Preference alarm_button = findPreference(getString(R.string.alarm_preferences));
                 Preference watch_button = findPreference(getString(R.string.watch_preferences));
+                Preference color_light_button = findPreference(getString(R.string.color_light_preferences));
+                Preference light_button = findPreference(getString(R.string.light_preferences));
+                Preference cycling_mode_button = findPreference(getString(R.string.cycling_mode_preferences));
 
                 if (speed_button != null) {
                     speed_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -161,6 +167,42 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                         }
                     });
                 }
+                if (color_light_button != null) {
+                    color_light_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            currentScreen = SettingsScreen.Color_Lights;
+                            getPreferenceScreen().removeAll();
+                            addPreferencesFromResource(R.xml.preferences_color_light);
+                            setup_screen();
+                            return true;
+                        }
+                    });
+                }
+                if (color_light_button != null) {
+                    light_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            currentScreen = SettingsScreen.Lights;
+                            getPreferenceScreen().removeAll();
+                            addPreferencesFromResource(R.xml.preferences_light);
+                            setup_screen();
+                            return true;
+                        }
+                    });
+                }
+                if (color_light_button != null) {
+                    color_light_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            currentScreen = SettingsScreen.Cycling_mode;
+                            getPreferenceScreen().removeAll();
+                            addPreferencesFromResource(R.xml.preferences_cycling_mode);
+                            setup_screen();
+                            return true;
+                        }
+                    });
+                }
                 break;
             case Speed:
                 tb.setTitle("Speed Settings");
@@ -174,6 +216,15 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                 break;
             case Watch:
                 tb.setTitle("Watch Settings");
+                break;
+            case Color_Lights:
+                tb.setTitle("Color lights");
+                break;
+            case Lights:
+                tb.setTitle("Lights");
+                break;
+            case Cycling_mode:
+                tb.setTitle("Cycling mode");
                 break;
         }
     }
