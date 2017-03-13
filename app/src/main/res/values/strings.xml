@@ -104,15 +104,15 @@
     <string name="tilt_back" translatable="false">tilt_back</string>
 
     // COLOR LIGHT PREFERENCES
-    <string name="activate_color_light" translatable="false">activate_color_light</string>
-    <string name="color_light_modes" translatable="false">color_light_modes</string>
+    <string name="color_light_enabled" translatable="false">color_light_enabled</string>
+    <string name="color_light_mode" translatable="false">color_light_mode</string>
 
     // LIGHT PREFERENCES
-    <string name="activate_light" translatable="false">activate_light</string>
-    <string name="light_modes" translatable="false">light_modes</string>
+    <string name="light_enabled" translatable="false">light_enabled</string>
+    <string name="light_mode" translatable="false">light_mode</string>
 
     // CYCLING MODE PREFERENCES
-    <string name="cycling_modes" translatable="false">cycling_modes</string>
+    <string name="cycling_mode" translatable="false">cycling_mode</string>
 
     // WATCH PREFERENCES
     <string name="horn_mode" translatable="false">horn_mode</string>

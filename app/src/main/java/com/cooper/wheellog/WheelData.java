@@ -10,6 +10,9 @@ import android.os.Vibrator;
 import com.cooper.wheellog.utils.Constants;
 import com.cooper.wheellog.utils.Constants.ALARM_TYPE;
 import com.cooper.wheellog.utils.Constants.WHEEL_TYPE;
+import com.cooper.wheellog.utils.Constants.CYCLING_MODE;
+import com.cooper.wheellog.utils.Constants.LIGHT_MODE;
+import com.cooper.wheellog.utils.Constants.COLOR_LIGHT_MODE;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -63,6 +66,16 @@ public class WheelData {
     private int mAlarm2Battery = 0;
     private int mAlarm3Battery = 0;
     private int mAlarmCurrent = 0;
+
+    private int mAlarm1 = 0;
+    private int mAlarm2 = 0;
+    private int mAlarm3 = 0;
+    private int mTiltback = 0;
+    private boolean mColorLightEnabled = true;
+    private boolean mLightEnabled = true;
+    private CYCLING_MODE mCyclingMode = CYCLING_MODE.PLAYER;
+    private COLOR_LIGHT_MODE mColorLightMode = COLOR_LIGHT_MODE.MODE_1;
+    private LIGHT_MODE mLightMode = LIGHT_MODE.AUTO;
 
     private boolean mSpeedAlarmExecuted = false;
     private boolean mCurrentAlarmExecuted = false;
@@ -189,9 +202,12 @@ public class WheelData {
     }
 
     void setPreferences(int alarm1Speed, int alarm1Battery,
-                                   int alarm2Speed, int alarm2Battery,
-                                   int alarm3Speed, int alarm3Battery,
-                                   int alarmCurrent, boolean disablePhoneVibrate) {
+                        int alarm2Speed, int alarm2Battery,
+                        int alarm3Speed, int alarm3Battery,
+                        int alarmCurrent, boolean disablePhoneVibrate,
+                        boolean lightEnabled, boolean colorLightEnabled,
+                        LIGHT_MODE lightMode, COLOR_LIGHT_MODE colorLightMode,
+                        int tiltback, int alarm1, int alarm2, int alarm3) {
         mAlarm1Speed = alarm1Speed * 100;
         mAlarm2Speed = alarm2Speed * 100;
         mAlarm3Speed = alarm3Speed * 100;
@@ -200,6 +216,14 @@ public class WheelData {
         mAlarm3Battery = alarm3Battery;
         mAlarmCurrent = alarmCurrent*100;
         mDisablePhoneVibrate = disablePhoneVibrate;
+        mLightEnabled = lightEnabled;
+        mColorLightEnabled = colorLightEnabled;
+        mLightMode = lightMode;
+        mColorLightMode = colorLightMode;
+        mTiltback = tiltback;
+        mAlarm1 = alarm1;
+        mAlarm2 = alarm2;
+        mAlarm3 = alarm3;
     }
 
     private int byteArrayInt2(byte low, byte high) {
@@ -579,7 +603,7 @@ public class WheelData {
         return false;
     }
 
-    public void setAlarms(int alarm1, int alarm2, int alarm3, int tilt_back) {
+    private void setAlarms(int alarm1, int alarm2, int alarm3, int tilt_back) {
         byte[] data = new byte[20];
         data[0x0] = -86;
         data[0x1] = 85;
@@ -611,13 +635,7 @@ public class WheelData {
             mBluetoothLeService.writeBluetoothGattCharacteristic(data);
     }
 
-    public enum CYCLING_MODE {
-        PLAY,
-        RIDE,
-        LEARNING
-    }
-
-    public void setCyclingMode(CYCLING_MODE mode) {
+    private void setCyclingMode(CYCLING_MODE mode) {
         byte[] arrayOfByte = new byte[20];
         arrayOfByte[0] = -86;
         arrayOfByte[1] = 85;
@@ -631,7 +649,7 @@ public class WheelData {
             mBluetoothLeService.writeBluetoothGattCharacteristic(arrayOfByte);
     }
 
-    public void setLight(int value) {
+    private void setLight(int value) {
         byte[] data = new byte[0x14];
         data[0x0] = -0x56;
         data[0x1] = 0x55;
@@ -644,13 +662,7 @@ public class WheelData {
             mBluetoothLeService.writeBluetoothGattCharacteristic(data);
     }
 
-    public enum LIGHT_MODE {
-        ON,
-        AUTO,
-        OFF
-    }
-
-    public void setLightMode(LIGHT_MODE mode) {
+    private void setLightMode(LIGHT_MODE mode) {
         byte[] data = new byte[0x14];
         data[0x0] = -0x56;
         data[0x1] = 0x55;
@@ -664,7 +676,7 @@ public class WheelData {
             mBluetoothLeService.writeBluetoothGattCharacteristic(data);
     }
 
-    public void setColorLight(int value) {
+    private void setColorLight(int value) {
         byte[] data = new byte[0x14];
         data[0x0] = -0x56;
         data[0x1] = 0x55;
@@ -677,13 +689,7 @@ public class WheelData {
             mBluetoothLeService.writeBluetoothGattCharacteristic(data);
     }
 
-    public enum COLOR_LIGHT_MODE {
-        MODE_1,
-        MODE_2,
-        MODE_3
-    }
-
-    public void setColorLightMode(COLOR_LIGHT_MODE mode) {
+    private void setColorLightMode(COLOR_LIGHT_MODE mode) {
         byte[] data = new byte[0x14];
         data[0x0] = -0x56;
         data[0x1] = 0x55;
@@ -694,5 +700,31 @@ public class WheelData {
         data[0x13] = 0x5a;
         if(mBluetoothLeService != null)
             mBluetoothLeService.writeBluetoothGattCharacteristic(data);
+    }
+
+    public void writeConfig(String param) {
+        switch (param) {
+            case "alarm1":
+            case "alarm2":
+            case "alarm3":
+            case "tilt_back":
+                setAlarms(mAlarm1, mAlarm2, mAlarm3, mTiltback);
+                break;
+            case "color_light_enabled":
+                setColorLight(mColorLightEnabled ? 1 : 0);
+                break;
+            case "color_light_mode":
+                setColorLightMode(mColorLightMode);
+                break;
+            case "light_enabled":
+                setLight(mLightEnabled ? 1 : 0);
+                break;
+            case "light_mode":
+                setLightMode(mLightMode);
+                break;
+            case "cycling_mode":
+                setCyclingMode(mCyclingMode);
+                break;
+        }
     }
 }

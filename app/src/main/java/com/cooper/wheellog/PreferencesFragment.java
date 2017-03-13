@@ -54,6 +54,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        boolean intentSent = false;
         switch (key) {
             case "alarms_enabled":
                 hideShowSeekBars();
@@ -90,7 +91,44 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
             case "max_speed":
                 getActivity().sendBroadcast(new Intent(Constants.ACTION_PEBBLE_AFFECTING_PREFERENCE_CHANGED));
                 break;
+            case "alarm1":
+                getActivity().sendBroadcast(new Intent(Constants.ACTION_PREFERENCE_CHANGED).putExtra("parameter", "alarm1"));
+                intentSent = true;
+                break;
+            case "alarm2":
+                getActivity().sendBroadcast(new Intent(Constants.ACTION_PREFERENCE_CHANGED).putExtra("parameter", "alarm2"));
+                intentSent = true;
+                break;
+            case "alarm3":
+                getActivity().sendBroadcast(new Intent(Constants.ACTION_PREFERENCE_CHANGED).putExtra("parameter", "alarm3"));
+                intentSent = true;
+                break;
+            case "tilt_back":
+                getActivity().sendBroadcast(new Intent(Constants.ACTION_PREFERENCE_CHANGED).putExtra("parameter", "tilt_back"));
+                intentSent = true;
+                break;
+            case "color_light_enabled":
+                getActivity().sendBroadcast(new Intent(Constants.ACTION_PREFERENCE_CHANGED).putExtra("parameter", "color_light_enabled"));
+                intentSent = true;
+                break;
+            case "color_light_mode":
+                getActivity().sendBroadcast(new Intent(Constants.ACTION_PREFERENCE_CHANGED).putExtra("parameter", "color_light_mode"));
+                intentSent = true;
+                break;
+            case "light_enabled":
+                getActivity().sendBroadcast(new Intent(Constants.ACTION_PREFERENCE_CHANGED).putExtra("parameter", "light_enabled"));
+                intentSent = true;
+                break;
+            case "light_mode":
+                getActivity().sendBroadcast(new Intent(Constants.ACTION_PREFERENCE_CHANGED).putExtra("parameter", "light_mode"));
+                intentSent = true;
+                break;
+            case "cycling_mode":
+                getActivity().sendBroadcast(new Intent(Constants.ACTION_PREFERENCE_CHANGED).putExtra("parameter", "cycling_mode"));
+                intentSent = true;
+                break;
         }
+        if(!intentSent)
         getActivity().sendBroadcast(new Intent(Constants.ACTION_PREFERENCE_CHANGED));
     }
 
@@ -179,7 +217,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                         }
                     });
                 }
-                if (color_light_button != null) {
+                if (light_button != null) {
                     light_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
@@ -191,8 +229,8 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                         }
                     });
                 }
-                if (color_light_button != null) {
-                    color_light_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                if (cycling_mode_button != null) {
+                    cycling_mode_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
                             currentScreen = SettingsScreen.Cycling_mode;
@@ -218,13 +256,13 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                 tb.setTitle("Watch Settings");
                 break;
             case Color_Lights:
-                tb.setTitle("Color lights");
+                tb.setTitle("LED Settings");
                 break;
             case Lights:
-                tb.setTitle("Lights");
+                tb.setTitle("Lights Settings");
                 break;
             case Cycling_mode:
-                tb.setTitle("Cycling mode");
+                tb.setTitle("Cycling mode Settings");
                 break;
         }
     }

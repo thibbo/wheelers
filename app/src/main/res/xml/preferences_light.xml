@@ -4,11 +4,11 @@
     <SwitchPreference
         android:defaultValue="true"
         android:title="Activate light"
-        android:key="@string/activate_light" />
+        android:key="@string/light_enabled" />
     <ListPreference
         android:defaultValue="1"
         android:title="Select mode"
         android:entries="@array/light_modes"
         android:entryValues="@array/light_mode_values"
-        android:key="@string/light_modes" />
+        android:key="@string/light_mode" />
 </PreferenceScreen>

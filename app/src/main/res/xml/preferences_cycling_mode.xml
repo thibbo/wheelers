@@ -4,7 +4,7 @@
     <ListPreference
         android:defaultValue="1"
         android:title="Select cycling mode"
-        android:entries="@array/cycling_modes"
+        android:entries="@array/modes"
         android:entryValues="@array/cycling_mode_values"
-        android:key="@string/cycling_modes" />
+        android:key="@string/cycling_mode" />
 </PreferenceScreen>

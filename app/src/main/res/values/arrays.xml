@@ -41,12 +41,6 @@
         <item>2</item>
     </string-array>
 
-    <string-array name="cycling_modes">
-        <item>Player mode</item>
-        <item>Riding mode</item>
-        <item>Learning mode</item>
-    </string-array>
-
     <string-array name="cycling_mode_values">
         <item>0</item>
         <item>1</item>

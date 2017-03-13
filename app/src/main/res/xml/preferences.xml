@@ -24,14 +24,17 @@
 
     <Preference
         android:key="@string/color_light_preferences"
-        android:title="Color lights" />
+        android:title="LED Settings" />
 
     <Preference
         android:key="@string/light_preferences"
-        android:title="Lights" />
+        android:title="Lights Settings" />
 
-    <Preference
-        android:key="@string/cycling_mode_preferences"
-        android:title="Cycling mode" />
+    <ListPreference
+        android:defaultValue="1"
+        android:title="Cycling mode Settings"
+        android:entries="@array/modes"
+        android:entryValues="@array/cycling_mode_values"
+        android:key="@string/cycling_mode" />
 
 </PreferenceScreen>

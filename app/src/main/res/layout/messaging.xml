@@ -47,14 +47,26 @@
         android:divider="@android:color/transparent"
         android:id="@+id/list_of_messages"
         android:layout_marginBottom="16dp"
-        android:visibility="gone" />
+        android:visibility="visible" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/disconnected_view"
+        android:gravity="center"
+        android:visibility="visible">
 
-    <Button
-        android:text="@string/reconnect_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/reconnect_button"
-        android:layout_weight="1"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/background"
+            android:alpha="0.5" />
+
+        <TextView
+            android:text="Disconnected"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/textView"
+            android:gravity="center" />
+
+    </RelativeLayout>
 </RelativeLayout>

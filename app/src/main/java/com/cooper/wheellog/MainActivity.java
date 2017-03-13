@@ -33,8 +33,10 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,8 +63,11 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.slel.ChatMessage;
 import com.slel.KeyGenerator;
 import com.slel.MessagingActivity;
@@ -112,6 +117,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     LineChart chart1;
     WheelView wheelView;
     ListView messageListView;
+    RelativeLayout disconnectedView;
+    FloatingActionButton sendingButton;
     int viewPagerPage = 1;
     private BluetoothLeService mBluetoothLeService;
     private BluetoothAdapter mBluetoothAdapter;
@@ -203,6 +210,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     break;
                 case Constants.ACTION_PREFERENCE_CHANGED:
                     loadPreferences();
+                    if(intent.hasExtra("parameter")) {
+                        String param = intent.getStringExtra("parameter");
+                        WheelData.getInstance().writeConfig(param);
+                    }
                     break;
             }
         }
@@ -629,6 +640,28 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         wheelView = (WheelView) findViewById(R.id.wheelView);
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         messageListView = (ListView) findViewById(R.id.list_of_messages);
+        disconnectedView = (RelativeLayout) findViewById(R.id.disconnected_view);
+        sendingButton = (FloatingActionButton) findViewById(R.id.fab);
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(".info/connected");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                boolean connected = snapshot.getValue(Boolean.class);
+                if (connected) {
+                    disconnectedView.setVisibility(View.GONE);
+                    sendingButton.setClickable(true);
+                } else {
+                    disconnectedView.setVisibility(View.VISIBLE);
+                    sendingButton.setClickable(false);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                System.err.println("Listener was cancelled");
+            }
+        });
 
         mDrawer.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
@@ -854,24 +887,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         wheelView.invalidate();
 
         // attempt to write alarms
-        int alarm1 = sharedPreferences.getInt(getString(R.string.alarm1), 10);
-        int alarm2 = sharedPreferences.getInt(getString(R.string.alarm2), 15);
-        int alarm3 = sharedPreferences.getInt(getString(R.string.alarm3), 20);
-        int tilt_back = sharedPreferences.getInt(getString(R.string.tilt_back), 25);
-        WheelData.getInstance().setAlarms(alarm1, alarm2, alarm3, tilt_back);
+        int alarm1 = SettingsUtil.getAlarm1(this);
+        int alarm2 = SettingsUtil.getAlarm2(this);
+        int alarm3 = SettingsUtil.getAlarm3(this);
+        int tilt_back = SettingsUtil.getTiltBack(this);
 
-        boolean color_light_enabled = sharedPreferences.getBoolean(getString(R.string.activate_color_light), true);
-        int color_light_mode = Integer.valueOf(sharedPreferences.getString(getString(R.string.color_light_modes), "0"));
-        WheelData.getInstance().setColorLight(color_light_enabled ? 1 : 0);
-        WheelData.getInstance().setColorLightMode(WheelData.COLOR_LIGHT_MODE.values()[color_light_mode]);
-
-        boolean light_enabled = sharedPreferences.getBoolean(getString(R.string.activate_light), true);
-        int light_mode = Integer.valueOf(sharedPreferences.getString(getString(R.string.light_modes), "0"));
-        WheelData.getInstance().setLight(light_enabled ? 1 : 0);
-        WheelData.getInstance().setLightMode(WheelData.LIGHT_MODE.values()[light_mode]);
-
-        int cycling_mode = sharedPreferences.getInt(getString(R.string.cycling_modes), 1);
-        WheelData.getInstance().setCyclingMode(WheelData.CYCLING_MODE.values()[cycling_mode]);
+        boolean color_light_enabled = SettingsUtil.getColorLightEnabled(this);
+        Constants.COLOR_LIGHT_MODE color_light_mode = SettingsUtil.getColorLightMode(this);
+        boolean light_enabled = SettingsUtil.getLightEnabled(this);
+        Constants.LIGHT_MODE light_mode = SettingsUtil.getLightMode(this);
+        Constants.CYCLING_MODE cycling_mode = SettingsUtil.getCyclingMode(this);
+//        WheelData.getInstance().setAlarms(alarm1, alarm2, alarm3, tilt_back);
+//        WheelData.getInstance().setCyclingMode(WheelData.CYCLING_MODE.values()[cycling_mode]);
+//        WheelData.getInstance().setLight(light_enabled ? 1 : 0);
+//        WheelData.getInstance().setLightMode(WheelData.LIGHT_MODE.values()[light_mode]);
+//        WheelData.getInstance().setColorLight(color_light_enabled ? 1 : 0);
+//        WheelData.getInstance().setColorLightMode(WheelData.COLOR_LIGHT_MODE.values()[color_light_mode]);
 
 
         boolean alarms_enabled = sharedPreferences.getBoolean(getString(R.string.alarms_enabled), false);
@@ -892,7 +923,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     alarm1Speed, alarm1Battery,
                     alarm2Speed, alarm2Battery,
                     alarm3Speed, alarm3Battery,
-                    current_alarm, disablePhoneVibrate);
+                    current_alarm, disablePhoneVibrate,
+                    light_enabled, color_light_enabled,
+                    light_mode, color_light_mode,
+                    tilt_back, alarm1, alarm2, alarm3);
             wheelView.setWarningSpeed(alarm1Speed);
         } else
             wheelView.setWarningSpeed(0);

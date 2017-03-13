@@ -55,6 +55,24 @@ public class Constants {
         NINEBOT
     }
 
+    public enum CYCLING_MODE {
+        PLAYER,
+        RIDING,
+        LEARNING
+    }
+
+    public enum LIGHT_MODE {
+        ON,
+        AUTO,
+        OFF
+    }
+
+    public enum COLOR_LIGHT_MODE {
+        MODE_1,
+        MODE_2,
+        MODE_3
+    }
+
     public enum PEBBLE_APP_SCREEN {
         GUI(0),
         DETAILS(1);

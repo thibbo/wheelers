@@ -91,4 +91,40 @@ public class SettingsUtil {
     public static int getHornMode(Context context) {
         return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.horn_mode), "0"));
     }
+
+    public static Constants.CYCLING_MODE getCyclingMode(Context context) {
+        return Constants.CYCLING_MODE.values()[Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.cycling_mode), "0"))];
+    }
+
+    public static Constants.COLOR_LIGHT_MODE getColorLightMode(Context context) {
+        return Constants.COLOR_LIGHT_MODE.values()[Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.color_light_mode), "0"))];
+    }
+
+    public static boolean getColorLightEnabled(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.color_light_enabled), true);
+    }
+
+    public static Constants.LIGHT_MODE getLightMode(Context context) {
+        return Constants.LIGHT_MODE.values()[Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.light_mode), "0"))];
+    }
+
+    public static boolean getLightEnabled(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.light_enabled), true);
+    }
+
+    public static int getAlarm1(Context context) {
+        return getSharedPreferences(context).getInt(context.getString(R.string.alarm1), 10);
+    }
+
+    public static int getAlarm2(Context context) {
+        return getSharedPreferences(context).getInt(context.getString(R.string.alarm2), 15);
+    }
+
+    public static int getAlarm3(Context context) {
+        return getSharedPreferences(context).getInt(context.getString(R.string.alarm3), 20);
+    }
+
+    public static int getTiltBack(Context context) {
+        return getSharedPreferences(context).getInt(context.getString(R.string.tilt_back), 25);
+    }
 }
