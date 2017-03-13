@@ -666,8 +666,13 @@ public class WheelData {
         byte[] data = new byte[0x14];
         data[0x0] = -0x56;
         data[0x1] = 0x55;
-        data[0x2] = (byte) mode.ordinal();
-        data[0x3] = (byte) 0x0;
+        if(mode == LIGHT_MODE.OFF)
+            data[0x2] = 0x13;
+        else if(mode == LIGHT_MODE.AUTO)
+            data[0x2] = 0x14;
+        else if(mode == LIGHT_MODE.ON)
+            data[0x2] = 0x12;
+        data[0x3] = (byte) 1; //getVoiceEnabled()
         data[0x10] = 0x73;
         data[0x11] = 0x14;
         data[0x12] = 0x5a;
@@ -675,6 +680,19 @@ public class WheelData {
         if(mBluetoothLeService != null)
             mBluetoothLeService.writeBluetoothGattCharacteristic(data);
     }
+/*
+    private void setVoiceActivation(0 = voice activated; 1 = disabled) {
+        byte[] data = new byte[0x14];
+        data[0x0] = -0x56;
+        data[0x1] = 0x55;
+        data[0x3] = (byte) mode.ordinal();
+        data[0x10] = 0x73;
+        data[0x11] = 0x14;
+        data[0x12] = 0x5a;
+        data[0x13] = 0x5a;
+        if(mBluetoothLeService != null)
+            mBluetoothLeService.writeBluetoothGattCharacteristic(data);
+    }*/
 
     private void setColorLight(int value) {
         byte[] data = new byte[0x14];
