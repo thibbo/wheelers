@@ -96,6 +96,10 @@ public class SettingsUtil {
         return Constants.CYCLING_MODE.values()[Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.cycling_mode), "0"))];
     }
 
+    public static boolean getVoiceEnabled(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.voice_enabled), false);
+    }
+
     public static Constants.COLOR_LIGHT_MODE getColorLightMode(Context context) {
         return Constants.COLOR_LIGHT_MODE.values()[Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.color_light_mode), "0"))];
     }

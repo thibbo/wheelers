@@ -75,8 +75,8 @@
     <string name="watch_preferences" translatable="false">watch_preferences</string>
     <string name="color_light_preferences" translatable="false">color_light_preferences</string>
     <string name="light_preferences" translatable="false">light_preferences</string>
-    <string name="cycling_mode_preferences" translatable="false">cycling_mode_preferences</string>
     <string name="debrider_preferences" translatable="false">debrider_preferences</string>
+    <string name="voiceoff_preferences" translatable="false">voiceoff_preferences</string>
 
     // ALARM PREFERENCES
     <string name="alarms_enabled" translatable="false">alarms_enabled</string>
@@ -120,4 +120,7 @@
     // UNLOCKER PREFERENCES
     <string name="unlocker_enabled" translatable="false">unlocker_enabled</string>
     <string name="reconnect_button">RECONNECT</string>
+
+    // VOICE ACTIVATION PREFERENCES
+    <string name="voice_enabled" translatable="false">voice_enabled</string>
 </resources>

@@ -37,4 +37,9 @@
         android:entryValues="@array/cycling_mode_values"
         android:key="@string/cycling_mode" />
 
+    <Preference
+        android:key="@string/voiceoff_preferences"
+        android:title="Voice activation" />
+
+
 </PreferenceScreen>

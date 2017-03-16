@@ -25,7 +25,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
         Watch,
         Color_Lights,
         Lights,
-        Cycling_mode
+        Voice_activation
     }
 
     private boolean mDataWarningDisplayed = false;
@@ -127,6 +127,10 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                 getActivity().sendBroadcast(new Intent(Constants.ACTION_PREFERENCE_CHANGED).putExtra("parameter", "cycling_mode"));
                 intentSent = true;
                 break;
+            case "voice_enabled":
+                getActivity().sendBroadcast(new Intent(Constants.ACTION_PREFERENCE_CHANGED).putExtra("parameter", "voice_enabled"));
+                intentSent = true;
+                break;
         }
         if(!intentSent)
         getActivity().sendBroadcast(new Intent(Constants.ACTION_PREFERENCE_CHANGED));
@@ -155,7 +159,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                 Preference watch_button = findPreference(getString(R.string.watch_preferences));
                 Preference color_light_button = findPreference(getString(R.string.color_light_preferences));
                 Preference light_button = findPreference(getString(R.string.light_preferences));
-                Preference cycling_mode_button = findPreference(getString(R.string.cycling_mode_preferences));
+                Preference voice_activation_button = findPreference(getString(R.string.voiceoff_preferences));
 
                 if (speed_button != null) {
                     speed_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -229,13 +233,13 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                         }
                     });
                 }
-                if (cycling_mode_button != null) {
-                    cycling_mode_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                if (voice_activation_button != null) {
+                    voice_activation_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
-                            currentScreen = SettingsScreen.Cycling_mode;
+                            currentScreen = SettingsScreen.Voice_activation;
                             getPreferenceScreen().removeAll();
-                            addPreferencesFromResource(R.xml.preferences_cycling_mode);
+                            addPreferencesFromResource(R.xml.preferences_voiceoff);
                             setup_screen();
                             return true;
                         }
@@ -261,8 +265,8 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
             case Lights:
                 tb.setTitle("Lights Settings");
                 break;
-            case Cycling_mode:
-                tb.setTitle("Cycling mode Settings");
+            case Voice_activation:
+                tb.setTitle("Voice activation");
                 break;
         }
     }

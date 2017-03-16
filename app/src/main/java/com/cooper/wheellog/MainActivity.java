@@ -897,12 +897,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         boolean light_enabled = SettingsUtil.getLightEnabled(this);
         Constants.LIGHT_MODE light_mode = SettingsUtil.getLightMode(this);
         Constants.CYCLING_MODE cycling_mode = SettingsUtil.getCyclingMode(this);
-//        WheelData.getInstance().setAlarms(alarm1, alarm2, alarm3, tilt_back);
-//        WheelData.getInstance().setCyclingMode(WheelData.CYCLING_MODE.values()[cycling_mode]);
-//        WheelData.getInstance().setLight(light_enabled ? 1 : 0);
-//        WheelData.getInstance().setLightMode(WheelData.LIGHT_MODE.values()[light_mode]);
-//        WheelData.getInstance().setColorLight(color_light_enabled ? 1 : 0);
-//        WheelData.getInstance().setColorLightMode(WheelData.COLOR_LIGHT_MODE.values()[color_light_mode]);
+        boolean voice_enabled = SettingsUtil.getVoiceEnabled(this);
 
 
         boolean alarms_enabled = sharedPreferences.getBoolean(getString(R.string.alarms_enabled), false);
@@ -920,16 +915,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             boolean disablePhoneVibrate = sharedPreferences.getBoolean(getString(R.string.disable_phone_vibrate), false);
 
             WheelData.getInstance().setPreferences(
-                    alarm1Speed, alarm1Battery,
-                    alarm2Speed, alarm2Battery,
-                    alarm3Speed, alarm3Battery,
-                    current_alarm, disablePhoneVibrate,
-                    light_enabled, color_light_enabled,
-                    light_mode, color_light_mode,
-                    tilt_back, alarm1, alarm2, alarm3);
+                alarm1Speed, alarm1Battery,
+                alarm2Speed, alarm2Battery,
+                alarm3Speed, alarm3Battery,
+                current_alarm, disablePhoneVibrate,
+                light_enabled, color_light_enabled,
+                light_mode, color_light_mode,
+                tilt_back, alarm1, alarm2, alarm3, cycling_mode, voice_enabled);
             wheelView.setWarningSpeed(alarm1Speed);
-        } else
+        } else {
+            WheelData.getInstance().setPreferences(
+                0, 0,
+                0, 0,
+                0, 0,
+                0, false,
+                light_enabled, color_light_enabled,
+                light_mode, color_light_mode,
+                tilt_back, alarm1, alarm2, alarm3, cycling_mode, voice_enabled);
             wheelView.setWarningSpeed(0);
+        }
 
         boolean auto_log = sharedPreferences.getBoolean(getString(R.string.auto_log), false);
         boolean log_location = sharedPreferences.getBoolean(getString(R.string.log_location_data), false);

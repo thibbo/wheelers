@@ -76,6 +76,7 @@ public class WheelData {
     private CYCLING_MODE mCyclingMode = CYCLING_MODE.PLAYER;
     private COLOR_LIGHT_MODE mColorLightMode = COLOR_LIGHT_MODE.MODE_1;
     private LIGHT_MODE mLightMode = LIGHT_MODE.AUTO;
+    private boolean mVoiceEnabled = false;
 
     private boolean mSpeedAlarmExecuted = false;
     private boolean mCurrentAlarmExecuted = false;
@@ -207,7 +208,7 @@ public class WheelData {
                         int alarmCurrent, boolean disablePhoneVibrate,
                         boolean lightEnabled, boolean colorLightEnabled,
                         LIGHT_MODE lightMode, COLOR_LIGHT_MODE colorLightMode,
-                        int tiltback, int alarm1, int alarm2, int alarm3) {
+                        int tiltback, int alarm1, int alarm2, int alarm3, CYCLING_MODE cycling_mode, boolean voice_enabled) {
         mAlarm1Speed = alarm1Speed * 100;
         mAlarm2Speed = alarm2Speed * 100;
         mAlarm3Speed = alarm3Speed * 100;
@@ -224,6 +225,8 @@ public class WheelData {
         mAlarm1 = alarm1;
         mAlarm2 = alarm2;
         mAlarm3 = alarm3;
+        mCyclingMode = cycling_mode;
+        mVoiceEnabled = voice_enabled;
     }
 
     private int byteArrayInt2(byte low, byte high) {
@@ -672,7 +675,7 @@ public class WheelData {
             data[0x2] = 0x14;
         else if(mode == LIGHT_MODE.ON)
             data[0x2] = 0x12;
-        data[0x3] = (byte) 1; //getVoiceEnabled()
+        data[0x3] = (byte) (mVoiceEnabled ? 0 : 1);
         data[0x10] = 0x73;
         data[0x11] = 0x14;
         data[0x12] = 0x5a;
@@ -680,19 +683,19 @@ public class WheelData {
         if(mBluetoothLeService != null)
             mBluetoothLeService.writeBluetoothGattCharacteristic(data);
     }
-/*
-    private void setVoiceActivation(0 = voice activated; 1 = disabled) {
+
+    private void setVoiceActivation(boolean voice_enabled) {
         byte[] data = new byte[0x14];
         data[0x0] = -0x56;
         data[0x1] = 0x55;
-        data[0x3] = (byte) mode.ordinal();
+        data[0x3] = (byte)(voice_enabled ? 0 : 1);
         data[0x10] = 0x73;
         data[0x11] = 0x14;
         data[0x12] = 0x5a;
         data[0x13] = 0x5a;
         if(mBluetoothLeService != null)
             mBluetoothLeService.writeBluetoothGattCharacteristic(data);
-    }*/
+    }
 
     private void setColorLight(int value) {
         byte[] data = new byte[0x14];
@@ -729,19 +732,22 @@ public class WheelData {
                 setAlarms(mAlarm1, mAlarm2, mAlarm3, mTiltback);
                 break;
             case "color_light_enabled":
-                setColorLight(mColorLightEnabled ? 1 : 0);
+                setColorLight(mColorLightEnabled ? 0 : 1);
                 break;
             case "color_light_mode":
                 setColorLightMode(mColorLightMode);
                 break;
             case "light_enabled":
-                setLight(mLightEnabled ? 1 : 0);
+                setLight(mLightEnabled ? 0 : 1);
                 break;
             case "light_mode":
                 setLightMode(mLightMode);
                 break;
             case "cycling_mode":
                 setCyclingMode(mCyclingMode);
+                break;
+            case "voice_enabled":
+                setVoiceActivation(mVoiceEnabled);
                 break;
         }
     }
